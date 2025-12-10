@@ -1,0 +1,19 @@
+{
+  "name": "pro-tasker-v1",
+  "version": "1.0.0",
+  "description": "Full-stack MERN project management application - Version 1",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run server\" \"npm run client\"",
+    "server": "cd backend && npm run dev",
+    "client": "cd frontend && npm run dev",
+    "build": "cd frontend && npm run build",
+    "start": "cd backend && npm start"
+  },
+  "keywords": ["mern", "react", "nodejs", "mongodb", "project-management"],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "concurrently": "^8.2.0"
+  }
+}

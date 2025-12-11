@@ -16,7 +16,7 @@ const connectDB = async () => {
     // If something goes wrong, this will print the error so you know what happened
     console.error(`❌ MongoDB connection error: ${error.message}`);
 
-    // This stops your app from running if the database didn't connect — which is a good thing!
+    // This stops your app from running if the database didn't connect 
     process.exit(1);
   }
 };

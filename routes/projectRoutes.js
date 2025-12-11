@@ -1,17 +1,17 @@
 const express = require("express");
-// const { authMiddleware } = require("../middlewares/auth"); // Temporarily disabled for Lab 2
+const { authMiddleware } = require("../middlewares/auth");
 const Project = require("../models/Project");
 
-const projectRouter = express.Router();
+const router = express.Router();
 
-// projectRouter.use(authMiddleware); // Temporarily disabled for Lab 2
+// ✅ Protect all routes in this router
+router.use(authMiddleware);
 
-/**
- * GET /api/projects
- */
-projectRouter.get("/", async (req, res) => {
+// Now define your project routes
+router.get("/", async (req, res) => {
   try {
-    const userProjects = await Project.find(); // No user filtering for Lab 2
+    // Filter projects by the authenticated user's ID
+    const userProjects = await Project.find({ user: req.user._id });
     res.json(userProjects);
   } catch (error) {
     console.error(error);
@@ -19,10 +19,7 @@ projectRouter.get("/", async (req, res) => {
   }
 });
 
-/**
- * GET /api/projects/:projectId
- */
-projectRouter.get("/:projectId", async (req, res) => {
+router.get("/:projectId", async (req, res) => {
   try {
     const { projectId } = req.params;
     const project = await Project.findById(projectId);
@@ -31,21 +28,23 @@ projectRouter.get("/:projectId", async (req, res) => {
       return res.status(404).json({ message: `Project with id: ${projectId} not found!` });
     }
 
-    res.json(project); // Skipping user ownership check
+    // Check if the project belongs to the authenticated user
+    if (project.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
+    }
+
+    res.json(project);
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: error.message });
   }
 });
 
-/**
- * POST /api/projects
- */
-projectRouter.post("/", async (req, res) => {
+router.post("/", async (req, res) => {
   try {
     const newProject = await Project.create({
       ...req.body,
-      // user: req.user._id, // Skipped for Lab 2
+      user: req.user._id, // Associate project with authenticated user
     });
 
     res.status(201).json(newProject);
@@ -55,16 +54,18 @@ projectRouter.post("/", async (req, res) => {
   }
 });
 
-/**
- * PUT /api/projects/:projectId
- */
-projectRouter.put("/:projectId", async (req, res) => {
+router.put("/:projectId", async (req, res) => {
   try {
     const { projectId } = req.params;
     const project = await Project.findById(projectId);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Check ownership
+    if (project.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     project.name = req.body.name || project.name;
@@ -78,16 +79,18 @@ projectRouter.put("/:projectId", async (req, res) => {
   }
 });
 
-/**
- * DELETE /api/projects/:projectId
- */
-projectRouter.delete("/:projectId", async (req, res) => {
+router.delete("/:projectId", async (req, res) => {
   try {
     const { projectId } = req.params;
     const project = await Project.findById(projectId);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
+    }
+
+    // Check ownership
+    if (project.user.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: "Access denied" });
     }
 
     await project.deleteOne();
@@ -98,4 +101,4 @@ projectRouter.delete("/:projectId", async (req, res) => {
   }
 });
 
-module.exports = projectRouter;
+module.exports = router;

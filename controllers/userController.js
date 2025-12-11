@@ -51,7 +51,7 @@ async function loginUser(req, res) {
       return res.status(400).json({ message: "Incorrect email or password." });
     }
 
-    const passwordMatched = await dbUser.isCorrectPassword(password);
+    const passwordMatched = await dbUser.comparePassword(password);
 
     if (!passwordMatched) {
       return res.status(400).json({ message: "Incorrect email or password." });

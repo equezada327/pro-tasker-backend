@@ -24,42 +24,29 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Password is required'],
     minlength: [6, 'Password must be at least 6 characters']
+  },
+  githubId: {
+    type: String
   }
 }, {
-  timestamps: true // Adds createdAt and updatedAt fields
+  timestamps: true
 });
 
-// Pre-save hook to hash password before saving to database
-userSchema.pre('save', async function(next) {
-  // Only hash the password if it has been modified (or is new)
+// Pre-save hook to hash password - NO next() needed with async
+userSchema.pre('save', async function() {
   if (!this.isModified('password')) {
-    return next();
+    return;
   }
-
-  try {
-    // Generate salt with 12 rounds (secure but not too slow)
-    const salt = await bcrypt.genSalt(12);
-    
-    // Hash password with the salt
-    this.password = await bcrypt.hash(this.password, salt);
-    
-    next();
-  } catch (error) {
-    next(error);
-  }
+  const salt = await bcrypt.genSalt(12);
+  this.password = await bcrypt.hash(this.password, salt);
 });
 
-// Instance method to compare password during login
+// Compare password during login
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  try {
-    // Compare the provided password with the hashed password
-    return await bcrypt.compare(candidatePassword, this.password);
-  } catch (error) {
-    throw error;
-  }
+  return await bcrypt.compare(candidatePassword, this.password);
 };
 
-// Remove password from JSON output for security
+// Remove password from JSON output
 userSchema.methods.toJSON = function() {
   const userObject = this.toObject();
   delete userObject.password;

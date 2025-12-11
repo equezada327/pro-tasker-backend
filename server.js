@@ -3,14 +3,20 @@ require('dotenv').config();
 
 const express = require('express');
 const connectDB = require('./config/database');
+const cors = require('cors');
 
 // Import route files
-const userRoutes = require('./routes/api/userRoutes');
-const projectRoutes = require('./routes/api/projectRoutes');
-const taskRoutes = require('./routes/api/taskRoutes');
+const userRoutes = require('./routes/userRoutes');
+const projectRoutes = require('./routes/projectRoutes');
+const taskRoutes = require('./routes/taskRoutes');
 
 // Initialize Express app
 const app = express();
+
+app.use(cors({
+  origin: 'http://localhost:3000',  
+  credentials: true
+}));
 
 // Connect to MongoDB
 connectDB();
@@ -35,7 +41,7 @@ app.use((err, req, res, next) => {
 });
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use((req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 

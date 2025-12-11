@@ -41,13 +41,12 @@ taskRouter.get("/projects/:projectId/tasks", async (req, res) => {
  */
 taskRouter.post("/projects/:projectId/tasks", async (req, res) => {
   try {
-    const { project, title, description, status, priority, dueDate } = req.body;
+    const { title, description, status, priority, dueDate } = req.body;
+const project = req.params.projectId; // Get project ID from URL
 
-    // Verify the project belongs to the user
-    const projectOwned = await Task.findOne({ _id: project }).populate({
-      path: "project",
-      match: { user: req.user._id }
-    });
+// Verify the project belongs to the user
+const Project = require("../models/Project");
+const projectOwned = await Project.findOne({ _id: project, user: req.user._id });
 
     if (!projectOwned) {
       return res.status(403).json({ message: "User not authorized to add tasks to this project" });

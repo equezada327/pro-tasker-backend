@@ -26,8 +26,8 @@ app.use(express.json({ extended: false })); // Parse JSON bodies
 
 // Define API routes
 app.use('/api/users', userRoutes);
+app.use('/api', taskRoutes);            
 app.use('/api/projects', projectRoutes);
-app.use('/api/projects/:projectId/tasks', taskRoutes);
 
 // Health check endpoint
 app.get('/', (req, res) => {

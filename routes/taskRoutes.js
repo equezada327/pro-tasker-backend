@@ -15,7 +15,7 @@ taskRouter.use(authMiddleware);
  * We query the database to find tasks where the project belongs to the logged-in user
  * This avoids fetching all tasks and filtering in memory, improving performance
  */
-taskRouter.get("/", async (req, res) => {
+taskRouter.get("/projects/:projectId/tasks", async (req, res) => {
   try {
     // Find tasks where the project belongs to the logged-in user
     const tasks = await Task.find()
@@ -39,7 +39,7 @@ taskRouter.get("/", async (req, res) => {
  * Create a new task under a project owned by the authenticated user
  * We verify ownership of the project before creating the task
  */
-taskRouter.post("/", async (req, res) => {
+taskRouter.post("/projects/:projectId/tasks", async (req, res) => {
   try {
     const { project, title, description, status, priority, dueDate } = req.body;
 

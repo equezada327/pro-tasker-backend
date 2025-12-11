@@ -1,432 +1,231 @@
-# TaskMaster API
+cd ~/OneDrive/Desktop/2025-rtt-54/Pro-Tasker/pro-tasker-backend
 
-A secure RESTful API for project and task management built with Node.js, Express, and MongoDB. This backend application provides complete user authentication, project management, and task tracking capabilities with robust authorization controls.
+cat > README.md << 'EOF'
+# Pro-Tasker Backend API
 
-## 🎯 Project Overview
+RESTful API server for the Pro-Tasker task management application. Built with Node.js, Express, and MongoDB.
 
-TaskMaster API is a comprehensive backend solution designed for productivity applications. It implements industry-standard security practices with JWT authentication, bcrypt password hashing, and ownership-based authorization to ensure data integrity and user privacy.
+## 🚀 Live API
 
-## ✨ Features
+**Base URL:** https://pro-tasker-backend-1-b0pc.onrender.com
 
-### 🔐 Authentication & Security
-- **User Registration** with secure password hashing using bcrypt
-- **JWT-based Authentication** with token expiration
-- **Protected Routes** with middleware authorization
-- **Ownership-based Access Control** - users can only access their own data
+## 📋 Features
 
-### 📊 Project Management
-- **Create Projects** with descriptions and status tracking
-- **Full CRUD Operations** on user-owned projects
-- **Project Ownership Verification** for all operations
-- **Status Management** (Active, Completed, On Hold, Cancelled)
+- User authentication with JWT tokens
+- Password hashing with bcrypt
+- CRUD operations for projects and tasks
+- Ownership-based authorization
+- MongoDB with Mongoose ODM
+- Input validation and error handling
 
-### ✅ Task Management
-- **Nested Task Creation** within projects
-- **Task Status Tracking** (To Do, In Progress, Done)
-- **Priority Levels** (Low, Medium, High, Urgent)
-- **Due Date Management** with validation
-- **Complex Authorization** - access tasks only through owned projects
+## 🛠️ Technologies
 
-### 🗄️ Data Relationships
-- **User → Projects** (One-to-Many relationship)
-- **Project → Tasks** (One-to-Many relationship)
-- **MongoDB References** with proper population
-- **Cascade Deletion** - removing projects deletes associated tasks
-
-## 🛠️ Technology Stack
-
-- **Runtime:** Node.js
-- **Framework:** Express.js
-- **Database:** MongoDB with Mongoose ODM
-- **Authentication:** JSON Web Tokens (JWT)
-- **Security:** bcrypt for password hashing
-- **Environment:** dotenv for configuration
-- **Development:** nodemon for hot reloading
+- **Node.js** - JavaScript runtime
+- **Express** - Web framework
+- **MongoDB** - NoSQL database
+- **Mongoose** - ODM for MongoDB
+- **JWT** - JSON Web Tokens for authentication
+- **bcrypt** - Password hashing
+- **dotenv** - Environment variable management
+- **CORS** - Cross-origin resource sharing
 
 ## 📁 Project Structure
-
 ```
-taskmaster-api-app/
+pro-tasker-backend/
 ├── config/
-│   └── database.js          # MongoDB connection configuration
+│   └── database.js           # MongoDB connection
+├── controllers/
+│   └── userController.js     # User authentication logic
+├── middlewares/
+│   └── auth.js               # JWT verification middleware
 ├── models/
-│   ├── User.js             # User schema with password hashing
-│   ├── Project.js          # Project schema with user reference
-│   └── Task.js             # Task schema with project reference
+│   ├── User.js               # User schema
+│   ├── Project.js            # Project schema
+│   └── Task.js               # Task schema
 ├── routes/
-│   └── api/
-│       ├── userRoutes.js   # Authentication endpoints
-│       ├── projectRoutes.js # Project CRUD operations
-│       └── taskRoutes.js   # Task management endpoints
-├── utils/
-│   └── auth.js             # JWT middleware and utilities
-├── .env                    # Environment variables (not in repo)
-├── .env.example           # Environment template
-├── .gitignore             # Git ignore rules
-├── package.json           # Dependencies and scripts
-├── server.js              # Application entry point
-└── README.md              # Project documentation
+│   ├── userRoutes.js         # User endpoints
+│   ├── projectRoutes.js      # Project endpoints
+│   └── taskRoutes.js         # Task endpoints
+├── .env                       # Environment variables
+├── server.js                  # Application entry point
+└── package.json               # Dependencies
 ```
 
-## 🚀 Quick Start
+## 🔧 Installation & Setup
 
 ### Prerequisites
-- Node.js (v14 or higher)
-- MongoDB Atlas account or local MongoDB installation
-- Git
+- Node.js (v18 or higher)
+- MongoDB Atlas account or local MongoDB
 
-### Installation
+### Environment Variables
 
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/taskmaster-api-app.git
-   cd taskmaster-api-app
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment setup**
-   ```bash
-   cp .env.example .env
-   ```
-   
-   Edit `.env` with your configuration:
-   ```env
-   MONGO_URI=your_mongodb_connection_string
-   PORT=3000
-   JWT_SECRET=your_secure_jwt_secret_at_least_32_characters_long
-   ```
-
-4. **Start the server**
-   ```bash
-   # Development mode with nodemon
-   npm run dev
-   
-   # Production mode
-   npm start
-   ```
-
-5. **Verify installation**
-   ```bash
-   curl http://localhost:3000/
-   # Expected: {"message":"TaskMaster API is running!"}
-   ```
-
-## 📚 API Documentation
-
-### Base URL
+Create a `.env` file in the root directory:
 ```
-http://localhost:3000/api
+MONGO_URI=mongodb+srv://username:password@cluster.mongodb.net/database
+JWT_SECRET=your_secret_key_here
+PORT=4000
+FRONTEND_URL=http://localhost:5173
 ```
 
-### Authentication Endpoints
+### Install Dependencies
+```bash
+npm install
+```
 
-#### Register User
-- **POST** `/users/register`
-- **Body:**
-  ```json
-  {
+### Run Development Server
+```bash
+npm run dev
+```
+
+Server will start on `http://localhost:4000`
+
+## 📡 API Endpoints
+
+### Authentication
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| POST | `/api/users/register` | Register new user | No |
+| POST | `/api/users/login` | Login user | No |
+
+### Projects
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/projects` | Get all user's projects | Yes |
+| POST | `/api/projects` | Create new project | Yes |
+| GET | `/api/projects/:id` | Get single project | Yes |
+| PUT | `/api/projects/:id` | Update project | Yes |
+| DELETE | `/api/projects/:id` | Delete project | Yes |
+
+### Tasks
+
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|---------------|
+| GET | `/api/projects/:projectId/tasks` | Get all tasks for project | Yes |
+| POST | `/api/projects/:projectId/tasks` | Create new task | Yes |
+| PUT | `/api/tasks/:taskId` | Update task | Yes |
+| DELETE | `/api/tasks/:taskId` | Delete task | Yes |
+
+## 🔐 Authentication
+
+### Registration
+
+**Request:**
+```json
+POST /api/users/register
+{
+  "username": "johndoe",
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "_id": "123abc",
+  "username": "johndoe",
+  "email": "john@example.com",
+  "createdAt": "2025-12-11T10:00:00.000Z"
+}
+```
+
+### Login
+
+**Request:**
+```json
+POST /api/users/login
+{
+  "email": "john@example.com",
+  "password": "password123"
+}
+```
+
+**Response:**
+```json
+{
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "user": {
+    "_id": "123abc",
     "username": "johndoe",
-    "email": "john@example.com",
-    "password": "securepassword123"
+    "email": "john@example.com"
   }
-  ```
-- **Response:** User object with JWT token
+}
+```
 
-#### Login User
-- **POST** `/users/login`
-- **Body:**
-  ```json
-  {
-    "email": "john@example.com",
-    "password": "securepassword123"
-  }
-  ```
-- **Response:** User object with JWT token
+### Using JWT Token
 
-#### Get Profile
-- **GET** `/users/profile`
-- **Headers:** `Authorization: Bearer <token>`
-- **Response:** Current user profile
+Include token in Authorization header for protected routes:
+```
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+```
 
-### Project Endpoints
+## 🗄️ Database Schema
 
-All project endpoints require authentication via JWT token in the Authorization header.
-
-#### Create Project
-- **POST** `/projects`
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:**
-  ```json
-  {
-    "name": "My Project",
-    "description": "Project description",
-    "status": "Active"
-  }
-  ```
-
-#### Get All Projects
-- **GET** `/projects`
-- **Headers:** `Authorization: Bearer <token>`
-- **Query Parameters:** `status`, `sort`, `order`
-
-#### Get Single Project
-- **GET** `/projects/:id`
-- **Headers:** `Authorization: Bearer <token>`
-
-#### Update Project
-- **PUT** `/projects/:id`
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** Fields to update
-
-#### Delete Project
-- **DELETE** `/projects/:id`
-- **Headers:** `Authorization: Bearer <token>`
-
-### Task Endpoints
-
-#### Get Project Tasks
-- **GET** `/projects/:projectId/tasks`
-- **Headers:** `Authorization: Bearer <token>`
-- **Query Parameters:** `status`, `priority`, `sort`, `order`
-
-#### Create Task
-- **POST** `/projects/:projectId/tasks`
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:**
-  ```json
-  {
-    "title": "Task Title",
-    "description": "Task description",
-    "status": "To Do",
-    "priority": "Medium",
-    "dueDate": "2024-12-31"
-  }
-  ```
-
-#### Update Task
-- **PUT** `/tasks/:taskId`
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:** Fields to update
-
-#### Delete Task
-- **DELETE** `/tasks/:taskId`
-- **Headers:** `Authorization: Bearer <token>`
-
-#### Quick Status Update
-- **PATCH** `/tasks/:taskId/status`
-- **Headers:** `Authorization: Bearer <token>`
-- **Body:**
-  ```json
-  {
-    "status": "In Progress"
-  }
-  ```
-
-#### Get All User Tasks
-- **GET** `/tasks`
-- **Headers:** `Authorization: Bearer <token>`
-- **Query Parameters:** `status`, `priority`, `project`, `sort`, `order`
-
-#### Get Task Statistics
-- **GET** `/tasks/stats`
-- **Headers:** `Authorization: Bearer <token>`
-
-## 🧪 Testing the API
-
-### Using Postman or Insomnia
-
-1. **Health Check**
-   ```
-   GET http://localhost:3000/
-   ```
-
-2. **Register a new user**
-   ```
-   POST http://localhost:3000/api/users/register
-   Content-Type: application/json
-   
-   {
-     "username": "testuser",
-     "email": "test@example.com",
-     "password": "password123"
-   }
-   ```
-
-3. **Login to get JWT token**
-   ```
-   POST http://localhost:3000/api/users/login
-   Content-Type: application/json
-   
-   {
-     "email": "test@example.com",
-     "password": "password123"
-   }
-   ```
-
-4. **Create a project (use token from login)**
-   ```
-   POST http://localhost:3000/api/projects
-   Authorization: Bearer YOUR_JWT_TOKEN
-   Content-Type: application/json
-   
-   {
-     "name": "Test Project",
-     "description": "A test project"
-   }
-   ```
-
-5. **Create a task (use project ID from previous response)**
-   ```
-   POST http://localhost:3000/api/projects/PROJECT_ID/tasks
-   Authorization: Bearer YOUR_JWT_TOKEN
-   Content-Type: application/json
-   
-   {
-     "title": "Test Task",
-     "description": "A test task"
-   }
-   ```
-
-### Security Testing
-
-Verify the security features by testing:
-
-- **Unauthorized Access:** Try accessing protected routes without a token
-- **Invalid Tokens:** Use expired or malformed tokens
-- **Cross-User Access:** User A trying to access User B's projects/tasks
-- **Ownership Validation:** Modifying resources owned by other users
-
-All these attempts should return appropriate error responses (401 Unauthorized or 403 Forbidden).
-
-## 🔒 Security Features
-
-### JWT Authentication
-- Tokens expire in 7 days
-- Secret key validation
-- Automatic token verification on protected routes
-
-### Password Security
-- bcrypt hashing with 12 salt rounds
-- Passwords never stored in plain text
-- Password comparison using secure methods
-
-### Authorization Layers
-- **Route-level:** Authentication required for all protected endpoints
-- **Resource-level:** Users can only access their own projects
-- **Nested-level:** Task access verified through project ownership
-
-### Data Validation
-- Input validation using Mongoose schemas
-- Email format validation
-- Password strength requirements
-- Date validation for due dates
-
-## 🌍 Environment Variables
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `MONGO_URI` | MongoDB connection string | `mongodb+srv://user:pass@cluster.mongodb.net/taskmaster` |
-| `PORT` | Server port number | `3000` |
-| `JWT_SECRET` | Secret key for JWT signing | `your_secure_secret_key_here` |
-
-## 📝 Database Schema
-
-### User Schema
+### User Model
 ```javascript
 {
   username: String (required, 3-30 chars),
   email: String (required, unique, validated),
-  password: String (required, hashed with bcrypt),
-  createdAt: Date,
-  updatedAt: Date
+  password: String (required, hashed, min 6 chars),
+  timestamps: true
 }
 ```
 
-### Project Schema
+### Project Model
 ```javascript
 {
-  name: String (required, 3-100 chars, unique per user),
-  description: String (required, max 500 chars),
-  status: String (enum: Active, Completed, On Hold, Cancelled),
-  user: ObjectId (ref: User, required),
-  createdAt: Date,
-  updatedAt: Date
+  name: String (required),
+  description: String (required),
+  user: ObjectId (ref: 'User'),
+  timestamps: true
 }
 ```
 
-### Task Schema
+### Task Model
 ```javascript
 {
-  title: String (required, 3-100 chars),
-  description: String (required, max 1000 chars),
-  status: String (enum: To Do, In Progress, Done),
-  priority: String (enum: Low, Medium, High, Urgent),
-  project: ObjectId (ref: Project, required),
-  dueDate: Date (optional, must be future date),
-  createdAt: Date,
-  updatedAt: Date
+  title: String (required),
+  description: String (required),
+  status: String (enum: 'To Do', 'In Progress', 'Done'),
+  priority: String (enum: 'Low', 'Medium', 'High', 'Urgent'),
+  project: ObjectId (ref: 'Project'),
+  dueDate: Date,
+  timestamps: true
 }
 ```
+
+## 🔒 Security Features
+
+- **Password Hashing:** bcrypt with 12 salt rounds
+- **JWT Authentication:** 24-hour token expiration
+- **Ownership Validation:** Users can only access their own data
+- **Input Validation:** Mongoose schema validation
+- **Error Handling:** Centralized error middleware
+- **CORS:** Configured for frontend origin
 
 ## 🚀 Deployment
 
-### Prerequisites for deployment:
-- MongoDB Atlas account (for cloud database)
-- Environment variables configured on hosting platform
-- Node.js runtime support
+Deployed on **Render** as a Web Service:
 
-### Recommended Platforms:
-- **Railway:** Easy Node.js deployment
-- **Render:** Free tier available
-- **Heroku:** Popular choice for Node.js apps
-- **DigitalOcean App Platform:** Professional hosting
+1. Connect GitHub repository
+2. Set build command: `npm install`
+3. Set start command: `node server.js`
+4. Add environment variables
+5. Deploy automatically on git push
 
-### Deployment Steps:
-1. Set up environment variables on your platform
-2. Configure MongoDB Atlas with appropriate IP whitelist
-3. Update CORS settings if serving a frontend
-4. Set NODE_ENV to 'production'
+## 🔗 Frontend Repository
 
-## 🤝 Contributing
+Frontend code available at: https://github.com/equezada327/pro-tasker-frontend
 
-This is an educational project, but contributions are welcome:
+## 👤 Author
 
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Create a Pull Request
+Enrique Quezada
+- GitHub: [@equezada327](https://github.com/equezada327)
 
-## 📄 License
+## 📝 License
 
-This project is licensed under the MIT License. See LICENSE file for details.
-
-## 👨‍💻 Author
-
-**Bolivar Vega**
-- GitHub: https://github.com/Bvega/taskmaster-api-app.git
-- Email: bolivar.vega@gmail.com
-
-## 🙏 Acknowledgments
-
-- **Per Scholas** for the comprehensive backend development curriculum
-- **MongoDB University** for database design principles
-- **Express.js** community for excellent documentation
-- **JWT.io** for token debugging tools
-
----
-
-## 📊 Project Status
-
-✅ **COMPLETED** - All project requirements fulfilled
-- ✅ Authentication system implemented
-- ✅ Authorization with ownership verification
-- ✅ Full CRUD operations functional
-- ✅ Security testing completed
-- ✅ Documentation comprehensive
-- ✅ Ready for production deployment
+This project was created as a capstone project for a software engineering bootcamp.
+EOF
 
